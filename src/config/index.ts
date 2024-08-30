@@ -7,8 +7,8 @@ USERPORT:process.env.USER_SERVICE_URL,
 ADMINPORT:process.env.ADMIN_SERVICE_URL,
 TUTORPORT:process.env.TUTOR_SERVICE_URL,
 RABBITMQURL: process.env.RABBITMQ_URL || '',
-JWT_SECRET: process.env.JWT_SECRET ||'nextera@123'
-
+JWT_SECRET: process.env.JWT_SECRET ||'nextera@123',
+JWT_REFRESH_SECRET:process.env.JWT_REFRESH_SECRET||'nextera@123',
 }
 
 if(!config.RABBITMQURL){

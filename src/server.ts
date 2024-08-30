@@ -9,17 +9,16 @@ import { tutorRouter } from './modules/tutor/routes';
 
 const app = express();
 
+
+
+
+// CORS Configuration
 const corsOptions = {
-    origin: "http://localhost:5173",
-    credentials: true, 
-    methods: "GET,POST,PUT,PATCH,HEAD,DELETE",
-    allowedHeaders: "Content-Type,Authorization",
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-};
-
-
-app.use(cors(corsOptions));
+    origin: 'http://localhost:5173',
+    credentials: true // Allows cookies and credentials to be included
+  };
+  
+  app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
