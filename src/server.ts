@@ -14,7 +14,7 @@ const app = express();
 
 // CORS Configuration
 const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: '*',
     credentials: true // Allows cookies and credentials to be included
   };
   

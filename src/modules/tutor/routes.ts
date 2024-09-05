@@ -9,6 +9,7 @@ tutorRouter.post('/login',tutorController.login);
 tutorRouter.post('/forgotPassword',tutorController.forgotPassword)
 tutorRouter.post('/google_login',tutorController.googleLogin)
 tutorRouter.post('/resetPassword',tutorController.resetPassword)
+tutorRouter.get('/get-presigned-url',tutorController.getPresignedUrl)
 
 
 export {tutorRouter}

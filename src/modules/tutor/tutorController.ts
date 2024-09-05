@@ -1,6 +1,20 @@
 import exress,{Request,Response} from 'express';
 import tutorRabbitMqClient from './rabbitMQ.ts/client'
 import { generateToken } from '../../jwt/jwtCreate';
+
+import { S3Client, PutObjectCommand} from '@aws-sdk/client-s3'
+import { credentials } from 'amqplib';
+
+import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
+
+const s3Client = new S3Client({
+    region: 'ap-south-1',
+    credentials: {
+        accessKeyId: process.env.ACCESS_KEY!,
+        secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    },
+});
+
 export const tutorController={
     register :async(req:Request, res:Response)=>{
         try{
@@ -120,5 +134,33 @@ export const tutorController={
         }catch(error){
             console.log('error in goofle login frm tutor controller',error)
         }
-    }
+    },
+
+
+    getPresignedUrl: async (req: Request, res: Response) => {
+        try {
+            console.log('hy')
+            const { filename } = req.query;
+            console.log(filename,'filename');
+            
+            if (typeof filename !== 'string') {
+                return res.status(400).json({ error: 'Filename query parameter is required and should be a string.' });
+            }
+
+            const command = new PutObjectCommand({
+                Bucket: process.env.AWS_BUCKET_NAME!,
+                Key: filename,
+                ContentType: 'video/mp4', // Set the content type of the uploaded file
+            });
+            console.log(command,'command');
+            
+
+            const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL valid for 1 hour
+            console.log(url,'url')
+            return res.json({ url });
+        } catch (error) {
+            console.error('Error generating presigned URL', error);
+            return res.json({ error: 'Could not generate presigned URL' });
+        }
+    },
 }
