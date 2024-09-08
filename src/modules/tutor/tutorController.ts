@@ -2,8 +2,7 @@ import exress,{Request,Response} from 'express';
 import tutorRabbitMqClient from './rabbitMQ.ts/client'
 import { generateToken } from '../../jwt/jwtCreate';
 
-import { S3Client, PutObjectCommand} from '@aws-sdk/client-s3'
-import { credentials } from 'amqplib';
+import { S3Client, GetObjectCommand,PutObjectCommand} from '@aws-sdk/client-s3'
 
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 
@@ -137,30 +136,56 @@ export const tutorController={
     },
 
 
-    getPresignedUrl: async (req: Request, res: Response) => {
+    getPresignedUrlForUpload: async (req: Request, res: Response) => {
         try {
             console.log('hy')
-            const { filename } = req.query;
+            const { filename,fileType  } = req.query;
             console.log(filename,'filename');
-            
-            if (typeof filename !== 'string') {
-                return res.status(400).json({ error: 'Filename query parameter is required and should be a string.' });
+            if (typeof filename !== 'string' || typeof fileType !== 'string') {
+                return res.status(400).json({ error: 'Filename and fileType query parameters are required and should be strings.' });
             }
+              // Map fileType to content type if needed
+              const contentType = fileType === 'video' ? 'video/mp4' : 'image/jpeg'; // Default to JPEG for images
+
 
             const command = new PutObjectCommand({
                 Bucket: process.env.AWS_BUCKET_NAME!,
                 Key: filename,
-                ContentType: 'video/mp4', // Set the content type of the uploaded file
+                ContentType:contentType, // Set the content type of the uploaded file
             });
             console.log(command,'command');
             
 
             const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL valid for 1 hour
-            console.log(url,'url')
+            console.log('eeeeeeeeeeeeeeeeeeeeeeee',url,'urleeeeeeeeeeeeeeeee')
             return res.json({ url });
         } catch (error) {
             console.error('Error generating presigned URL', error);
             return res.json({ error: 'Could not generate presigned URL' });
         }
     },
+    getPresignedUrlForDownload: async (req: Request, res: Response) => {
+        try {
+            const { filename } = req.query;
+
+            if (typeof filename !== 'string') {
+                return res.status(400).json({ error: 'Filename query parameter is required and should be a string.' });
+            }
+
+            const command = new GetObjectCommand({
+                Bucket: process.env.AWS_BUCKET_NAME!,
+                Key: filename,
+            });
+
+            const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL valid for 1 hour
+            console.log('download url',url);
+            
+            return res.json({ url });
+        } catch (error) {
+            console.error('Error generating presigned URL for download', error);
+            return res.status(500).json({ error: 'Could not generate presigned URL' });
+        }
+    }
+    
 }
+

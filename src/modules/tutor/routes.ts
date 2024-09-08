@@ -9,7 +9,9 @@ tutorRouter.post('/login',tutorController.login);
 tutorRouter.post('/forgotPassword',tutorController.forgotPassword)
 tutorRouter.post('/google_login',tutorController.googleLogin)
 tutorRouter.post('/resetPassword',tutorController.resetPassword)
-tutorRouter.get('/get-presigned-url',tutorController.getPresignedUrl)
+tutorRouter.get('/get-presigned-url', tutorController.getPresignedUrlForUpload);
+tutorRouter.get('/get-presigned-url-download', tutorController.getPresignedUrlForDownload);
+
 
 
 export {tutorRouter}

@@ -111,7 +111,7 @@ export const userController = {
                 //     maxAge: 7 * 24 * 60 * 60 * 1000,
                 //     sameSite: "strict",
                 // });
-                console.log(req.cookies,'jkfkdjfkdjfkdjk');
+                // console.log(req.cookies,'jkfkdjfkdjfkdjk');
                 return res.json({result,token:{accessToken,refreshToken}})
             }
 
@@ -159,6 +159,7 @@ export const userController = {
             console.log("error in forgotpass in usercontroller", error);
         }
     },
+   
     resetPassword: async (req: Request, res: Response) => {
         try {
             console.log(req.body, "data reached inside the resetPassword");
@@ -186,29 +187,12 @@ export const userController = {
                     id: result.user._id,
                     email: result.user.email,
                 });
-                res.cookie("accessToken", accessToken, {
-                    httpOnly: true,
-                    secure: true,
-                    maxAge: 15 * 60 * 1000,
-                    sameSite: "strict",
-                });
-
-                res.cookie("refreshToken", refreshToken, {
-                    httpOnly: true,
-                    secure: true,
-                    maxAge: 7 * 24 * 60 * 60 * 1000,
-                    sameSite: "strict",
-                });
+            return res.json({result,token:{accessToken,refreshToken}})
             }
-
-            return res.json(result);
         } catch (error) {
             console.log(error, "error in google login");
         }
     },
-    logout:(req:Request,res:Response)=>{
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
-        res.status(200).json({message:'Logout Successfull'})
-    }
+    
+    
 };

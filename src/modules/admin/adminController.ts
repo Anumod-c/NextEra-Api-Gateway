@@ -68,4 +68,20 @@ export const adminController = {
             console.log('error in getotaltutor',err)
         }
     },
+    changeStatus:async(req:Request,res:Response)=>{
+        try{
+            const userId= req.params.userId;
+            const {status} = req.body;
+            console.log('data from block unblock ', userId,status);
+            const data ={
+                userId,
+                status,
+            }
+            const operation ='change_status';
+            const result:any =await userRabbitMqClient.produce(data,operation) ;
+            return res.json(result)
+        }catch(error){
+            console.log(error)
+        }
+    },
 }

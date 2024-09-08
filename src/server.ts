@@ -6,7 +6,7 @@ import config from './config';
 import { userRouter } from './modules/user/routes';
 import { adminRouter } from './modules/admin/routes';
 import { tutorRouter } from './modules/tutor/routes';
-
+import {courseRouter} from './modules/course/routes'
 const app = express();
 
 
@@ -14,8 +14,10 @@ const app = express();
 
 // CORS Configuration
 const corsOptions = {
-    origin: '*',
-    credentials: true // Allows cookies and credentials to be included
+    origin:'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,// Allows cookies and credentials to be included
+   
   };
   
   app.use(cors(corsOptions));
@@ -25,6 +27,7 @@ app.use(express.json());
 
 app.use('/admin', adminRouter);
 app.use('/tutor',tutorRouter);
+app.use('/course',courseRouter);
 app.use('/',userRouter);
 
 
