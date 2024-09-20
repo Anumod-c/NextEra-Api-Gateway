@@ -1,5 +1,6 @@
 import exress,{Request,Response} from 'express';
-import tutorRabbitMqClient from './rabbitMQ.ts/client'
+import tutorRabbitMqClient from './rabbitMQ.ts/client';
+import courseRabbitMqClient from '../course/rabbitMQ.ts/client'
 import { generateToken } from '../../jwt/jwtCreate';
 
 import { S3Client, GetObjectCommand,PutObjectCommand} from '@aws-sdk/client-s3'
@@ -140,13 +141,17 @@ export const tutorController={
         try {
             console.log('hy')
             const { filename,fileType  } = req.query;
-            console.log(filename,'filename');
+            console.log(filename,fileType,'filename');
             if (typeof filename !== 'string' || typeof fileType !== 'string') {
                 return res.status(400).json({ error: 'Filename and fileType query parameters are required and should be strings.' });
             }
               // Map fileType to content type if needed
-              const contentType = fileType === 'video' ? 'video/mp4' : 'image/jpeg'; // Default to JPEG for images
-
+              let contentType = 'application/octet-stream';
+        if (fileType === 'image') {
+            contentType = 'image/jpeg';
+        } else if (fileType === 'video') {
+            contentType = 'video/mp4'; // Adjust if necessary for different video types
+        }  
 
             const command = new PutObjectCommand({
                 Bucket: process.env.AWS_BUCKET_NAME!,
@@ -184,6 +189,19 @@ export const tutorController={
         } catch (error) {
             console.error('Error generating presigned URL for download', error);
             return res.status(500).json({ error: 'Could not generate presigned URL' });
+        }
+    },
+    courseList:async(req:Request,res:Response)=>{
+        try{
+            console.log('reached courselisting',req.query);
+            const {tutorId}= req.query;
+            const operation = 'courseList';
+            const result :any = await courseRabbitMqClient.produce(tutorId,operation);
+            return res.json(result)
+            
+        }catch(error){
+            console.log("error in courselisting in turorside");
+            
         }
     }
     

@@ -11,7 +11,7 @@ tutorRouter.post('/google_login',tutorController.googleLogin)
 tutorRouter.post('/resetPassword',tutorController.resetPassword)
 tutorRouter.get('/get-presigned-url', tutorController.getPresignedUrlForUpload);
 tutorRouter.get('/get-presigned-url-download', tutorController.getPresignedUrlForDownload);
-
+tutorRouter.get('/courseList',tutorController.courseList);
 
 
 export {tutorRouter}
