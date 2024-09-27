@@ -8,6 +8,7 @@ interface RabbitMqConfig{
             adminQueue:string,
             tutorQueue:string,
             courseQueue:string;
+            orderQueue:string;
         };
     };
 
@@ -20,7 +21,9 @@ const  rabbitMqConfig: RabbitMqConfig ={
             userQueue: 'user_queue' ,  // queue for user related operation
             adminQueue: 'admin_queue',
             tutorQueue: 'tutor_queue',
+            orderQueue: 'order_queue',
             courseQueue:'course_queue',
+           
         },
     },
 };

@@ -1,6 +1,6 @@
 import expres,{Request,Response} from 'express'
 
-import courseRabbitMqClient from './rabbitMQ.ts/client';
+import courseRabbitMqClient from './rabbitMQ/client';
 
 export const courseController={
     AddCourse:async(req:Request,res:Response)=>{
@@ -40,6 +40,8 @@ export const courseController={
             const operation = 'singleCourse'
             console.log('couseidddd',courseId);
             const result  =  await courseRabbitMqClient.produce(courseId,operation)
+            console.log("resulteeee",result);
+            
             return res.json(result)
             
         } catch (error) {

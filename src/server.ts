@@ -7,6 +7,7 @@ import { userRouter } from './modules/user/routes';
 import { adminRouter } from './modules/admin/routes';
 import { tutorRouter } from './modules/tutor/routes';
 import {courseRouter} from './modules/course/routes'
+import {  orderRouter } from './modules/orders/routes';
 const app = express();
 
 
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use('/admin', adminRouter);
 app.use('/tutor',tutorRouter);
 app.use('/course',courseRouter);
+app.use('/purchase',orderRouter)
 app.use('/',userRouter);
 
 

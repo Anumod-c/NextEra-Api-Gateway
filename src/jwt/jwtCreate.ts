@@ -14,7 +14,7 @@ export const generateToken = (user:UserPayload)=>{
         email:user.email
     }
 //Generate access token
-   const accessToken= jwt.sign(payload,config.JWT_SECRET as string ,{expiresIn :'15m'});
+   const accessToken= jwt.sign(payload,config.JWT_SECRET as string ,{expiresIn :'5d'});
 
 
    const refreshToken =jwt.sign(payload,config.JWT_REFRESH_SECRET as string ,{expiresIn : '7d'})

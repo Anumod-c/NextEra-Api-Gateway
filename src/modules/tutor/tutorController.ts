@@ -1,6 +1,7 @@
 import exress,{Request,Response} from 'express';
 import tutorRabbitMqClient from './rabbitMQ.ts/client';
-import courseRabbitMqClient from '../course/rabbitMQ.ts/client'
+import courseRabbitMqClient from '../course/rabbitMQ/client';
+ import ordeRabbitMqClient from '../orders/rabbitMQ/client'
 import { generateToken } from '../../jwt/jwtCreate';
 
 import { S3Client, GetObjectCommand,PutObjectCommand} from '@aws-sdk/client-s3'
@@ -202,6 +203,17 @@ export const tutorController={
         }catch(error){
             console.log("error in courselisting in turorside");
             
+        }
+    },
+    payouts:async(req:Request,res:Response)=>{
+        try {
+            const tutorId = req.query.tutorId;
+            console.log('..............................................................',tutorId)
+            const operation = 'tutor_payout'
+            const result :any = await ordeRabbitMqClient.produce(tutorId,operation);
+            return res.json(result);
+        } catch (error) {
+            console.log("error in payoutcontroler",error)
         }
     }
     
