@@ -28,8 +28,9 @@ export const courseController = {
             if (result.success && result.courses.length > 0) {
                 const coursesWithTutors = await Promise.all(
                     result.courses.map(async (course: any) => {
+                        const tutorId= course.tutorId;
                         const tutorDetails = await tutorRabbitMqClient.produce(
-                            { tutorId: course.tutorId },
+                            tutorId,
                             "fetchTutorById"
                         );
 
@@ -58,10 +59,35 @@ export const courseController = {
             const { courseId } = req.params;
             const operation = "singleCourse";
             console.log("couseidddd", courseId);
-            const result = await courseRabbitMqClient.produce(courseId, operation);
-            console.log("resulteeee", result);
+            const courseResult: any = await courseRabbitMqClient.produce(courseId, operation);
 
+            if (!courseResult.success) {
+                return res.status(404).json({ message: "Course not found" });
+            }
+            console.log("resulteeee", courseResult);
+            const course = courseResult.course;
+            const tutorId = course.tutorId;
+
+            // Fetch tutor details using tutorId
+            const tutorOperation = "fetchTutorById";
+            const tutorResult: any = await tutorRabbitMqClient.produce(tutorId, tutorOperation);
+
+
+            if (!tutorResult.success) {
+                return res.status(404).json({ message: "Tutor not found" });
+            }
+            console.log('datass',tutorResult)
+            const tutor = tutorResult.tutorDetails;
+
+            // Combine course and tutor data
+            const result = {
+                success: true,
+                message: "Single Course and Tutor fetched successfully",
+                course,
+                tutor
+            };
             return res.json(result);
+
         } catch (error) {
             console.log("Error in showing singlecourse page", error);
         }
