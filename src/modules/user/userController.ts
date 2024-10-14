@@ -2,6 +2,18 @@ import express, { Request, Response } from "express";
 import userRabbitMqClient from "./rabbitMQ/client";
 import { generateToken } from "../../jwt/jwtCreate";
 import jwt from "jsonwebtoken";
+import { S3Client, GetObjectCommand,PutObjectCommand} from '@aws-sdk/client-s3'
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+const s3Client = new S3Client({
+    region: 'ap-south-1',
+    credentials: {
+        accessKeyId: process.env.ACCESS_KEY!,
+        secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    },
+});
+
+
+
 export const userController = {
     register: async (req: Request, res: Response) => {
         try {
@@ -96,22 +108,10 @@ export const userController = {
                 const { accessToken, refreshToken } = generateToken({
                     id: result.userData._id,
                     email: result.userData.email,
+                    role:'user',
                 });
 
-                // res.cookie("accessToken", accessToken, {
-                //     httpOnly: true,
-                //     secure: true,
-                //     maxAge: 15 * 60 * 1000,
-                //     sameSite: "strict",
-                // });
-
-                // res.cookie("refreshToken", refreshToken, {
-                //     httpOnly: true,
-                //     secure: true,
-                //     maxAge: 7 * 24 * 60 * 60 * 1000,
-                //     sameSite: "strict",
-                // });
-                // console.log(req.cookies,'jkfkdjfkdjfkdjk');
+                
                 return res.json({result,token:{accessToken,refreshToken}})
             }
 
@@ -186,14 +186,69 @@ export const userController = {
                 const { accessToken, refreshToken } = generateToken({
                     id: result.user._id,
                     email: result.user.email,
+                    role:'user',
                 });
             return res.json({result,token:{accessToken,refreshToken}})
             }
+            return res.json(result)
         } catch (error) {
             console.log(error, "error in google login");
         }
     },
-    
+    editProfile:async(req:Request,res:Response)=>{
+        try {
+            const operation = 'editProfile';
+            const data  = req.body;
+            const result:any = await  userRabbitMqClient.produce(data,operation) ;
+            return res.json(result)
+            console.log("data from edit profile",req.body)
+        } catch (error) {
+            console.log("error in editing profile")
+        }
+    },
+    getPresignedUrlForUpload:async(req:Request,res:Response)=>{
+        try {
+            const { fileName,fileType  } = req.query;
+            console.log(fileName,fileType,'filename');
+            if (typeof fileName !== 'string' || typeof fileType !== 'string') {
+                return res.status(400).json({ error: 'Filename and fileType query parameters are required and should be strings.' });
+            }
+              // Map fileType to content type if needed
+              let contentType = 'application/octet-stream';
+        if (fileType === 'image') {
+            contentType = 'image/jpeg';
+        } else if (fileType === 'video') {
+            contentType = 'video/mp4'; // Adjust if necessary for different video types
+        }  
+        const command = new PutObjectCommand({
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: fileName,
+            ContentType:contentType, // Set the content type of the uploaded file
+        });
+        console.log(command,'command');
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL valid for 1 hour
+            console.log('eeeeeeeeeeeeeeeeeeeeeeee',url,'urleeeeeeeeeeeeeeeee')
+            return res.json({ url });
+        } catch (error) {
+            console.error('Error generating presigned URL', error);
+            return res.json({ error: 'Could not generate presigned URL' });
+        }
+    },
+    updateProfilePicture:async(req:Request,res:Response)=>{
+        try {
+            console.log(req.body,'hyyyyyyyyyyy');
+            const data = req.body;
+            const operation= 'updateProfilePicture'
+            const result:any= await userRabbitMqClient.produce(data,operation) ;
+            return res.json(result)
+
+
+        } catch (error) {
+            console.error('Error  updating the profile picture', error);
+            return res.json({ error: 'Could not update profile picture' })
+        }
+    },
+   
     
     
 };

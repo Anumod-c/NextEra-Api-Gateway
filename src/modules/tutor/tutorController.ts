@@ -81,8 +81,9 @@ export const tutorController={
             const operation = 'tutor_login';
             const result :any = await  tutorRabbitMqClient.produce(data,operation);
             if(result.success){
-                const token = generateToken({id:result.tutorData._id,email:result.tutorData.email})
+                const token = generateToken({id:result.tutorData._id,email:result.tutorData.email,role:'tutor'})
                 result.token = token;
+                console.log('tokeeeeeeen',result,result.token)
             }
             return res.json(result)
 
@@ -127,7 +128,8 @@ export const tutorController={
             if(result.success){
                 const token = generateToken({
                     id:result.tutor._id,
-                    email:result.tutor.email
+                    email:result.tutor.email,
+                    role:'tutor',
                 })
                 result.token=token;
             }

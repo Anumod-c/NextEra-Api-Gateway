@@ -9,6 +9,7 @@ interface RabbitMqConfig{
             tutorQueue:string,
             courseQueue:string;
             orderQueue:string;
+            chatQueue:string;
         };
     };
 
@@ -23,6 +24,7 @@ const  rabbitMqConfig: RabbitMqConfig ={
             tutorQueue: 'tutor_queue',
             orderQueue: 'order_queue',
             courseQueue:'course_queue',
+            chatQueue:'chat_queue',
            
         },
     },
