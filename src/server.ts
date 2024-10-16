@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { initializeSocket } from './socket/socketServer';
 import config from './config';
 import { userRouter } from './modules/user/routes';
 import { adminRouter } from './modules/admin/routes';
@@ -34,6 +35,7 @@ app.use('/',userRouter);
 
 
 const server =  http.createServer(app)
+initializeSocket(server);
 const  startServer =async()=>{
     try{
         server.listen(config.PORT,()=>{
