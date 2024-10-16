@@ -82,7 +82,9 @@ export const tutorController={
             const result :any = await  tutorRabbitMqClient.produce(data,operation);
             if(result.success){
                 const token = generateToken({id:result.tutorData._id,email:result.tutorData.email,role:'tutor'})
+                res.cookie('tutorId', result.tutorData._id);
                 result.token = token;
+                console.log("cookieeeeee",req.cookies.tutorId)
                 console.log('tokeeeeeeen',result,result.token)
             }
             return res.json(result)
@@ -126,6 +128,8 @@ export const tutorController={
             const operation =  'tutor_google_login';
             const result:any=  await tutorRabbitMqClient.produce({credential},operation);
             if(result.success){
+                res.cookie("tutorId",result.tutor._id)
+               
                 const token = generateToken({
                     id:result.tutor._id,
                     email:result.tutor.email,
@@ -217,7 +221,29 @@ export const tutorController={
         } catch (error) {
             console.log("error in payoutcontroler",error)
         }
+    },
+    getTotalCoursesCount:async(req:Request,res:Response)=>{
+        try {
+            console.log('helloooc')
+            const tutorId = req.params.tutorId
+            console.log('tutorId',tutorId);
+            const operation = 'getTotalCoursesCount';
+            const result = await courseRabbitMqClient.produce(tutorId,operation);
+            return res.json(result);
+        } catch (error) {
+            console.log("Error in myTotalCoursesCount",error)
+        }
+    },
+    async getTotalStudentsCount(req:Request,res:Response){
+        try {
+            const tutorId = req.params.tutorId;
+            const operation = 'getTotalStudentsCount'
+            const result = await courseRabbitMqClient.produce(tutorId,operation)
+            console.log('gettotalstudentscount',result)
+            return res.json(result)
+        } catch (error) {
+            console.log("Error in getTotalStudentsCount",error)
+        }
     }
-    
 }
 

@@ -111,7 +111,8 @@ export const userController = {
                     role:'user',
                 });
 
-                
+                res.cookie('userId', result.userData._id)
+                console.log("cookieeeeees",req.cookies.userId)
                 return res.json({result,token:{accessToken,refreshToken}})
             }
 
@@ -188,6 +189,8 @@ export const userController = {
                     email: result.user.email,
                     role:'user',
                 });
+                res.cookie('userId', result.user._id)
+
             return res.json({result,token:{accessToken,refreshToken}})
             }
             return res.json(result)
@@ -201,7 +204,6 @@ export const userController = {
             const data  = req.body;
             const result:any = await  userRabbitMqClient.produce(data,operation) ;
             return res.json(result)
-            console.log("data from edit profile",req.body)
         } catch (error) {
             console.log("error in editing profile")
         }
