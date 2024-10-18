@@ -193,5 +193,17 @@ export const courseController = {
             console.error('Error  fetching my courses', error);
             return res.json({ error: 'Could not fetch my courses' })
         }
+    },
+
+    fetchCourseChatList:async(req:Request,res:Response)=>{
+        try {
+            const userId = req.query.currentUserId;
+            console.log(userId,'userId')
+            const operation = 'fetchCourseChatList';
+            const result :any= await courseRabbitMqClient.produce(userId,operation);
+            return res.json(result); 
+        } catch (error) {
+            console.log("Error in listing puchased course for chat list",error)
+        }
     }
 };
