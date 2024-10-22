@@ -1,10 +1,12 @@
 import { Server, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import chatRabbitMqClient from '../modules/chat/rabbitMQ/client';
+import userRabbitMqClient from '../modules/user/rabbitMQ/client'
+import { IUser } from '../interface/IUser';
 interface ChatMessage {
     userId: string;
     text: string;
-    courseId?: string;  // If needed for tracking
+    courseId?: string;  
   }
   
 // Global io variable to access the socket instance
@@ -14,7 +16,7 @@ let io: Server;
 export const initializeSocket = (server: HttpServer) => {
     io = new Server(server, {
         cors: {
-            origin: 'http://localhost:5173', // Adjust if needed
+            origin: 'http://localhost:5173', 
             methods: ['POST', 'GET'],
             credentials: true,
         },
@@ -32,9 +34,10 @@ export const initializeSocket = (server: HttpServer) => {
             //fetch existing messages for  the course from database
             const previousMessage = await chatRabbitMqClient.produce(courseId,'loadPreviousMessages');
             console.log('bla blb bla bla ',previousMessage)
+            
             socket.emit('loadPreviousMessages',previousMessage)
         });
-
+ 
         socket.on('leaveRoom', (courseId) => {
             console.log(`User ${socket.id} left room ${courseId}`);
             socket.leave(courseId);
@@ -43,10 +46,26 @@ export const initializeSocket = (server: HttpServer) => {
         // Listener for 'sendMessage' event from client
         socket.on('sendMessage', async({ courseId, message }: { courseId: string, message: ChatMessage & { id: string } }) => {
             console.log(message,courseId);
-            const saveMessage = await  chatRabbitMqClient.produce(message,'save-message');
-            console.log('message saving is',saveMessage)
-            // Emit the message to the correct course room
-            io.to(courseId).emit('receiveMessage', { courseId, ...message });
+            try{
+                const saveMessage = await  chatRabbitMqClient.produce(message,'save-message');
+                console.log('message saving is',saveMessage)
+                // Emit the message to the correct course room
+                console.log('sssssss',message)
+
+                const userInfo:any= await userRabbitMqClient.produce(message.userId,'getUserDetails');
+                console.log("user detaild from message",message.text,'==',userInfo.user)
+                const messageWithUserDetails ={
+                    ...message,
+                    userName:userInfo.user.name,
+                    profilePicture:userInfo.user.profilePicture
+                }
+                
+                io.to(courseId).emit('receiveMessage', { courseId, ...messageWithUserDetails });
+            }catch(error){
+                console.log("Error in chat",error);
+                socket.emit('error', { message: 'Error processing the chat message' });               
+            }
+           
         });
 
         

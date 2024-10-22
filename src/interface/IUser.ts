@@ -13,6 +13,5 @@ export interface IUser {
     status: boolean;
     purchasedCourses?: string[];  
     wishlist?: string[];          
-
     created_At?: Date;
 }
