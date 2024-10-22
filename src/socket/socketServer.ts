@@ -32,10 +32,18 @@ export const initializeSocket = (server: HttpServer) => {
             socket.join(courseId);
 
             //fetch existing messages for  the course from database
-            const previousMessage = await chatRabbitMqClient.produce(courseId,'loadPreviousMessages');
+            const previousMessage:any = await chatRabbitMqClient.produce(courseId,'loadPreviousMessages');
             console.log('bla blb bla bla ',previousMessage)
-            
-            socket.emit('loadPreviousMessages',previousMessage)
+            const messagesWithUserDetails = await Promise.all(previousMessage.result.map(async (msg: any) => {
+                const userInfo: any = await userRabbitMqClient.produce(msg.userId, 'getUserDetails');
+                return {
+                    ...msg,
+                    userName: userInfo.user.name,
+                    profilePicture: userInfo.user.profilePicture
+                };
+            }));
+            console.log('messageWithUserDetails',messagesWithUserDetails)
+            socket.emit('loadPreviousMessages',messagesWithUserDetails)
         });
  
         socket.on('leaveRoom', (courseId) => {
