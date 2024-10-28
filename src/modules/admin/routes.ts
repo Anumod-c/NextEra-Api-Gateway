@@ -12,6 +12,7 @@ adminRouter.get("/getInstructorsCount",  authenticateToken(['admin']),adminContr
 adminRouter.get("/getTotalCourses",  authenticateToken(['admin']),adminController.getTotalCourses);
 adminRouter.patch("/changeStatus/:userId",  authenticateToken(['admin']),adminController.changeStatus),
 adminRouter.patch("/changeTutorStatus/:tutorId",  authenticateToken(['admin']),adminController.changeTutorStatus),
+adminRouter.patch("/changeTutorVerification/:tutorId",  authenticateToken(['admin']),adminController.changeTutorVerification),
 
 adminRouter.get('/payouts', authenticateToken(['admin']), adminController.adminPayouts)
 adminRouter.get('/courseTable', authenticateToken(['admin']), adminController.courseTable)

@@ -55,6 +55,7 @@ export const tutorController={
                     success: true,
                     forgotPass: forgotPass, // Return forgotPass status
                     message: forgotPass ? "OTP verified. Proceed to reset password." : "OTP verified. User registered successfully",
+                    tutor:!forgotPass? result.tutor_data : ''
                 });
             } else {
                 return res.status(500).json({
@@ -146,9 +147,9 @@ export const tutorController={
 
     getPresignedUrlForUpload: async (req: Request, res: Response) => {
         try {
-            console.log('hy')
+            console.log('hyee')
             const { filename,fileType  } = req.query;
-            console.log(filename,fileType,'filename');
+            console.log(filename,fileType,'filenamessss');
             if (typeof filename !== 'string' || typeof fileType !== 'string') {
                 return res.status(400).json({ error: 'Filename and fileType query parameters are required and should be strings.' });
             }
@@ -234,7 +235,7 @@ export const tutorController={
             console.log("Error in myTotalCoursesCount",error)
         }
     },
-    async getTotalStudentsCount(req:Request,res:Response){
+     getTotalStudentsCount:async(req:Request,res:Response)=>{
         try {
             const tutorId = req.params.tutorId;
             const operation = 'getTotalStudentsCount'
@@ -243,6 +244,33 @@ export const tutorController={
             return res.json(result)
         } catch (error) {
             console.log("Error in getTotalStudentsCount",error)
+        }
+    },
+     additionalInfo:async(req:Request,res:Response)=>{
+        try {
+           
+            console.log('hyadditionalInfo')
+            console.log('additional data',req.body)
+            const tutorData = req.body;
+            const operation ='additonalInfo'
+            const  result = await tutorRabbitMqClient.produce(tutorData,operation);
+            console.log('resu;teeeeee',result)
+            return res.json(result)
+        } catch (error) {
+            console.log("Error in  adding aditional info",error)
+        }
+    },
+    editProfile:async(req:Request,res:Response)=>{
+        try {
+           console.log('editprofiledata',req.body) 
+           const tutorData = req.body;
+           const operation ='editProfile'
+
+           const  result = await tutorRabbitMqClient.produce(tutorData,operation);
+           return res.json(result)
+
+        } catch (error) {
+            console.log("Eror in edit parofile")
         }
     }
 }

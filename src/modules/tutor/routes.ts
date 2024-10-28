@@ -16,5 +16,8 @@ tutorRouter.get('/courseList',tutorIsBlocked,authenticateToken(['tutor']),tutorC
 tutorRouter.get('/payouts', tutorIsBlocked,authenticateToken(['tutor']),tutorController.payouts)
 tutorRouter.get('/getTotalCoursesCount/:tutorId',authenticateToken(['tutor']),tutorController.getTotalCoursesCount)
 tutorRouter.get('/getStudentsCount/:tutorId',authenticateToken(['tutor']),tutorController.getTotalStudentsCount)
+tutorRouter.post('/additionalInfo',tutorController.additionalInfo)
+tutorRouter.post('/editProfile',tutorController.editProfile)
+
 
 export {tutorRouter}

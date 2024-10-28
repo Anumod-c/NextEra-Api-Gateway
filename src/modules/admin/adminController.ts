@@ -106,7 +106,23 @@ export const adminController = {
             const result: any = await tutorRabbitMqClient.produce(data, operation);
             return res.json(result);
         } catch (error) {
-            console.log(error);
+            console.log('Error in changin status for tutor',error);
+        }
+    },
+    changeTutorVerification:async(req:Request,res:Response)=>{
+        try {
+            const tutorId = req.params.tutorId;
+            const {isVerified}= req.body;
+            const data ={
+                tutorId,
+                isVerified,
+            }
+            const operation='changeVerificationStatus';
+            const result = await  tutorRabbitMqClient.produce(data,operation);
+            return res.json(result);
+        } catch (error) {
+            console.log('Error in changin verfication status for tutor',error);
+
         }
     },
     adminPayouts: async (req: Request, res: Response) => {
