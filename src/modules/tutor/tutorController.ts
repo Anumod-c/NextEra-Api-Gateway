@@ -272,6 +272,22 @@ export const tutorController={
         } catch (error) {
             console.log("Eror in edit parofile")
         }
-    }
+    },
+    changeCourseStatus: async (req: Request, res: Response) => {
+        try {
+            const courseId = req.params.courseId;
+            const { status } = req.body;
+            console.log("data from list unlist ", courseId, status);
+            const data = {
+                courseId,
+                status,
+            };
+            const operation = "change_course_status";
+            const result: any = await courseRabbitMqClient.produce(data, operation);
+            return res.json(result);
+        } catch (error) {
+            console.log(error);
+        }
+    },
 }
 

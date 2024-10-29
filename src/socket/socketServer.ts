@@ -75,6 +75,28 @@ export const initializeSocket = (server: HttpServer) => {
             }
            
         });
+        socket.on('sendImage', async ({ courseId, imageMessage }: { courseId: string; imageMessage: { userId: string; image: string } }) => {
+            try {
+              // Save image message (optional, depending on requirements)
+              const saveImageMessage = await chatRabbitMqClient.produce(imageMessage, 'save-image-message');
+          
+              // Get user details for the message
+              const userInfo: any = await userRabbitMqClient.produce(imageMessage.userId, 'getUserDetails');
+          
+              const imageMessageWithUserDetails = {
+                ...imageMessage,
+                userName: userInfo.user.name,
+                profilePicture: userInfo.user.profilePicture,
+              };
+          
+              // Emit image message to the course room
+              io.to(courseId).emit('receiveMessage', { courseId, ...imageMessageWithUserDetails });
+            } catch (error) {
+              console.log("Error in sending image", error);
+              socket.emit('error', { message: 'Error processing the image message' });
+            }
+          });
+          
 
         
           

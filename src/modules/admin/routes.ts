@@ -16,5 +16,8 @@ adminRouter.patch("/changeTutorVerification/:tutorId",  authenticateToken(['admi
 
 adminRouter.get('/payouts', authenticateToken(['admin']), adminController.adminPayouts)
 adminRouter.get('/courseTable', authenticateToken(['admin']), adminController.courseTable)
-adminRouter.get('/payoutsByMonth' , authenticateToken(['admin']), adminController.payoutsByMonth)
+adminRouter.get('/payoutsByMonth' , authenticateToken(['admin']), adminController.payoutsByMonth);
+
+adminRouter.patch("/changeCourseStatus/:courseId",  authenticateToken(['admin']),adminController.changeCourseStatus)
+
 export { adminRouter };

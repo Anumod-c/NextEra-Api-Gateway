@@ -19,5 +19,7 @@ tutorRouter.get('/getStudentsCount/:tutorId',authenticateToken(['tutor']),tutorC
 tutorRouter.post('/additionalInfo',tutorController.additionalInfo)
 tutorRouter.post('/editProfile',tutorController.editProfile)
 
+tutorRouter.patch("/changeCourseStatus/:courseId",  authenticateToken(['tutor']),tutorController.changeCourseStatus)
+
 
 export {tutorRouter}

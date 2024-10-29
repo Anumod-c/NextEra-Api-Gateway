@@ -94,7 +94,7 @@ export const adminController = {
     },
     changeTutorStatus: async (req: Request, res: Response) => {
         try {
-            console.log('fjshdfkshfkjsdfhkjsdfkjsdhfkjshdfkjshdkjfhsdkjfshdk')
+           
             const tutorId = req.params.tutorId;
             const { status } = req.body;
             console.log("data from block unblock ", tutorId, status);
@@ -186,5 +186,21 @@ export const adminController = {
         } catch (error) {
             console.log("Error in  fetching result for adminPayoutsForMonth",error)
         }
-    }
+    },
+    changeCourseStatus: async (req: Request, res: Response) => {
+        try {
+            const courseId = req.params.courseId;
+            const { status } = req.body;
+            console.log("data from list unlist ", courseId, status);
+            const data = {
+                courseId,
+                status,
+            };
+            const operation = "change_course_status";
+            const result: any = await courseRabbitMqClient.produce(data, operation);
+            return res.json(result);
+        } catch (error) {
+            console.log(error);
+        }
+    },
 };
