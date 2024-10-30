@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 
 import orderRabbitMqClient from './rabbitMQ/client';
 import userRabbitMqClient from '../user/rabbitMQ/client';
-import tutorRabbitMqClient from '../tutor/rabbitMQ.ts/client';
 import courseRabbitMqClient from '../course/rabbitMQ/client';
 import chatRabbitMqClient from '../chat/rabbitMQ/client'
 export const orderController = {

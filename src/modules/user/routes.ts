@@ -14,6 +14,9 @@ userRouter.post('/google_login',userController.googleLogin)
 userRouter.post('/editProfile',userIsBlocked ,userController.editProfile)
 userRouter.get('/get-presigned-url',userController.getPresignedUrlForUpload)
 userRouter.put('/updateProfilePicture',userIsBlocked ,userController.updateProfilePicture)
+userRouter.post('/add_reviews',userIsBlocked ,userController.addReviews)
+userRouter.get('/fetchReviews/:courseId',userIsBlocked ,userController.fetchReviews)
+
 // userRouter.post('/refreshToken',userController.refreshToken)
 
 

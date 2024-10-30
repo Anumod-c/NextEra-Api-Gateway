@@ -21,9 +21,11 @@ export const courseController = {
     fetchAllCourse: async (req: Request, res: Response) => {
         try {
             const operation = "fetchAllCourse";
-            console.log("reached fetched course");
+            const search =  req.query.search;
 
-            const result: any = await courseRabbitMqClient.produce({}, operation);
+            console.log(search,"reached fetched course");
+
+            const result: any = await courseRabbitMqClient.produce(search, operation);
             console.log("result", result);
             console.log("hyyy");
             if (result.success && result.courses.length > 0) {

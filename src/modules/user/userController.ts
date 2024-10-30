@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import userRabbitMqClient from "./rabbitMQ/client";
+import courseRabbtiMqClient from '../course/rabbitMQ/client'
 import { generateToken } from "../../jwt/jwtCreate";
 import jwt from "jsonwebtoken";
 import { S3Client, GetObjectCommand,PutObjectCommand} from '@aws-sdk/client-s3'
@@ -250,6 +251,55 @@ export const userController = {
             return res.json({ error: 'Could not update profile picture' })
         }
     },
+    addReviews:async(req:Request,res:Response)=>{
+        try {
+            const data = req.body;
+            const userId = data.userId;
+            const operation = 'add_review_rating'
+            console.log('data from review and rating',data)
+            const reviewResult = await courseRabbtiMqClient.produce(data,operation);
+            const userOperation ='getUserDetails';
+            const userResult = await userRabbitMqClient.produce(userId,userOperation);
+            const result= {reviewResult,userResult};
+            console.log('result of addrevierw with user details',result)
+            return res.json({result,success:true})
+
+        } catch (error) {
+            console.error('Error  submititng your review', error);
+            return res.json({ error: 'Error  submititng your review' })
+
+        }
+    },
+    fetchReviews:async (req:Request,res:Response)=>{
+        try {
+            const courseId= req.params.courseId;
+            const operation ='fetch_review';
+            const reviewResult :any= await courseRabbtiMqClient.produce(courseId,operation);
+            const reivewWithUser = await Promise.all(
+                reviewResult.newReview.map(async(review:any)=>{
+                    const userId = review.userId;
+                    const userDetails = await userRabbitMqClient.produce(
+                        userId,'getUserDetails'
+                    );
+                    return {
+                        ...review,userDetails:userDetails?userDetails: null
+                    }
+                })
+                
+
+            )
+            return res.json({
+                success:true,message:"Review fetched sucessfully",
+                newReview:reivewWithUser
+            })
+           
+           
+        } catch (error) {
+            console.error('Error  fetching review', error);
+            return res.json({ error: 'Error  fethiching  review' })
+
+        }
+    }
    
     
     
