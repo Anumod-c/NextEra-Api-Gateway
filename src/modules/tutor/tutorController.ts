@@ -289,5 +289,19 @@ export const tutorController={
             console.log(error);
         }
     },
+    payoutsByMonth:async(req:Request,res:Response)=>{
+        try {
+            console.log('reached payout by month of tutor')
+            const tutorId = req.query.tutorId;
+            console.log('tutorIdddddddddddddd',tutorId)
+            const operation = 'TutorPayoutsByMonth'
+            console.log('hy from  payouts by month from tutor')
+            const result = await ordeRabbitMqClient.produce(tutorId,operation);
+            console.log('result from payouts by month',result)
+            return res.json(result)
+        } catch (error) {
+            console.log("Error in  fetching result for tutorPayoutsForMonth",error)
+        }
+    },
 }
 

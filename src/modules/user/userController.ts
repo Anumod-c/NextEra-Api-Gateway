@@ -244,8 +244,6 @@ export const userController = {
             const operation= 'updateProfilePicture'
             const result:any= await userRabbitMqClient.produce(data,operation) ;
             return res.json(result)
-
-
         } catch (error) {
             console.error('Error  updating the profile picture', error);
             return res.json({ error: 'Could not update profile picture' })

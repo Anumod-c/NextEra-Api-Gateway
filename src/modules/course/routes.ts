@@ -8,6 +8,8 @@ courseRouter.post('/addCourse',courseController.AddCourse)
 courseRouter.get('/fetchAllCourses',courseController.fetchAllCourse)
 courseRouter.get('/fetchAllCourses/:courseId', courseController.singleCourse)
 courseRouter.get('/fetchLatestCourses',courseController.fetchLatestcourses)
+courseRouter.get('/fetchMostRatedCourse',courseController.fetchMostRatedCourse)
+
 courseRouter.post('/fetchMyCourses', userIsBlocked,courseController.fetchMyCourses)
 courseRouter.get('/fetchCourseChatList', userIsBlocked,courseController.fetchCourseChatList)
 

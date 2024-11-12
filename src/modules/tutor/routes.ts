@@ -18,6 +18,8 @@ tutorRouter.get('/getTotalCoursesCount/:tutorId',authenticateToken(['tutor']),tu
 tutorRouter.get('/getStudentsCount/:tutorId',authenticateToken(['tutor']),tutorController.getTotalStudentsCount)
 tutorRouter.post('/additionalInfo',tutorController.additionalInfo)
 tutorRouter.post('/editProfile',tutorController.editProfile)
+tutorRouter.get('/tutorPayoutsByMonth' , tutorController.payoutsByMonth);
+
 
 tutorRouter.patch("/changeCourseStatus/:courseId",  authenticateToken(['tutor']),tutorController.changeCourseStatus)
 

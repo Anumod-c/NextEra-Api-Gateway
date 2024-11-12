@@ -21,11 +21,16 @@ export const courseController = {
     fetchAllCourse: async (req: Request, res: Response) => {
         try {
             const operation = "fetchAllCourse";
-            const search =  req.query.search;
-
+            const { search, category, level, sort } = req.query;            
+            const filterOptions = {
+                search: search || "",
+                category: category || null,
+                level: level || null,
+                sort: sort || null,
+            };
             console.log(search,"reached fetched course");
 
-            const result: any = await courseRabbitMqClient.produce(search, operation);
+            const result: any = await courseRabbitMqClient.produce(filterOptions, operation);
             console.log("result", result);
             console.log("hyyy");
             if (result.success && result.courses.length > 0) {
@@ -122,6 +127,7 @@ export const courseController = {
             console.log("Error in showing singlecourse page", error);
         }
     },
+    
     fetchLatestcourses:async(req:Request,res:Response)=>{
         try {
             const operation = "fetchLatestCourses";
@@ -148,6 +154,43 @@ export const courseController = {
                 return res.json({
                     success: true,
                     message: "Latest Courses fetched successfully with tutor details",
+                    courses: coursesWithTutors,
+                });
+            }
+            return res.json({
+                success: false,
+                message: "No courses found",
+            });
+        } catch (error) {
+            console.log("error in fetching Latest course", error);
+        }
+    },
+    fetchMostRatedCourse:async(req:Request,res:Response)=>{
+        try {
+            const operation = "fetchMostRatedCourse";
+            console.log("reached  fetchMostRatedCourse course");
+
+            const result: any = await courseRabbitMqClient.produce({}, operation);
+            console.log(" fetchMostRatedCourse result", result);
+            console.log("fetchMostRatedCourse");
+            if (result.success && result.courses.length > 0) {
+                const coursesWithTutors = await Promise.all(
+                    result.courses.map(async (course: any) => {
+                        const tutorId = course.tutorId;
+                        const tutorDetails = await tutorRabbitMqClient.produce(
+                            tutorId,
+                            "fetchTutorById"
+                        );
+
+                        return {
+                            ...course,
+                            tutorDetails: tutorDetails ? tutorDetails : null,
+                        };
+                    })
+                );
+                return res.json({
+                    success: true,
+                    message: "fetchMostRatedCourse Courses fetched successfully with tutor details",
                     courses: coursesWithTutors,
                 });
             }
