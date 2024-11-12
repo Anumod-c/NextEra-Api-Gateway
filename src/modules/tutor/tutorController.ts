@@ -202,9 +202,11 @@ export const tutorController={
     courseList:async(req:Request,res:Response)=>{
         try{
             console.log('reached courselisting',req.query);
-            const {tutorId}= req.query;
+            const tutorId = req.query.tutorId as string;
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
             const operation = 'courseList';
-            const result :any = await courseRabbitMqClient.produce(tutorId,operation);
+            const result :any = await courseRabbitMqClient.produce({ tutorId, page, limit },operation);
             return res.json(result)
             
         }catch(error){
@@ -214,10 +216,12 @@ export const tutorController={
     },
     payouts:async(req:Request,res:Response)=>{
         try {
-            const tutorId = req.query.tutorId;
+            const tutorId = req.query.tutorId as string;
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
             console.log('..............................................................',tutorId)
             const operation = 'tutor_payout'
-            const result :any = await ordeRabbitMqClient.produce(tutorId,operation);
+            const result :any = await ordeRabbitMqClient.produce({ tutorId, page, limit },operation);
             return res.json(result);
         } catch (error) {
             console.log("error in payoutcontroler",error)

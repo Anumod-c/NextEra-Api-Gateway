@@ -29,8 +29,10 @@ export const adminController = {
 
     getUsers: async (req: Request, res: Response) => {
         try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
             const operation = "get_users";
-            const result: any = await userRabbitMqClient.produce({}, operation);
+            const result: any = await userRabbitMqClient.produce({  page, limit }, operation);
             console.log("fetched user reached apigateway", result);
             return res.json(result);
         } catch (err) {
@@ -39,8 +41,10 @@ export const adminController = {
     },
     getTutors: async (req: Request, res: Response) => {
         try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
             const operation = "get_Tutors";
-            const result: any = await tutorRabbitMqClient.produce({}, operation);
+            const result: any = await tutorRabbitMqClient.produce({  page, limit }, operation);
             console.log("fetched tutor reached apigateway", result);
             return res.json(result);
         } catch (err) {
@@ -128,9 +132,11 @@ export const adminController = {
     adminPayouts: async (req: Request, res: Response) => {
         try {
             const operation = "admin_payout";
-            const result: any = await ordeRabbitMqClient.produce({}, operation);
-            console.log("result", result);
-            const adminPayouts = result.adminPayouts;
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result: any = await ordeRabbitMqClient.produce({  page, limit }, operation);
+            console.log("resultof admin payouts", result);
+            const { adminPayouts, totalPages, currentPage } = result;            
             const payoutsWithTutors = await Promise.all(
                 adminPayouts.map(async (payout: any) => {
                     const tutorOperation = "fetchTutorById";
@@ -144,7 +150,8 @@ export const adminController = {
                     };
                 })
             );
-            return res.json({ adminPayouts: payoutsWithTutors });
+            console.log('payoutWithTutor',payoutsWithTutors)
+            return res.json({ adminPayouts: payoutsWithTutors,totalPages,currentPage });
         } catch (error) {
             console.log("error in payoutcontroler", error);
         }
@@ -152,10 +159,13 @@ export const adminController = {
     courseTable: async (req: Request, res: Response) => {
         try {
             const operation = "courseTable";
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+
             // Fetching the courses
             console.log('reached course table')
-            const result: any = await courseRabbitMqClient.produce({}, operation);
-            const courses = result.courses;
+            const result: any = await courseRabbitMqClient.produce({  page, limit }, operation);
+            const {courses,totalPages, currentPage} = result;
             console.log('resultttttttt', result)
             // Fetching tutor details for each course
             const coursesWithTutor = await Promise.all(courses.map(async (course: any) => {
@@ -170,7 +180,7 @@ export const adminController = {
                 };
             }));
             // Returning all courses with their tutor details
-            return res.json({ coursesWithTutor });
+            return res.json({ coursesWithTutor,totalPages,currentPage  });
         } catch (error) {
             console.log("Error in listing the course", error);
             return res.status(500).json({ message: "Internal Server Error" });
