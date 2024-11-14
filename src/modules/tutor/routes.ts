@@ -7,6 +7,9 @@ const tutorRouter = express.Router();
 tutorRouter.post('/register',tutorController.register);
 tutorRouter.post('/otp',tutorController.otp);
 tutorRouter.post('/login',tutorController.login);
+tutorRouter.post('/refresh-token',tutorController.refreshToken)
+
+
 tutorRouter.post('/forgotPassword',tutorController.forgotPassword)
 tutorRouter.post('/google_login',tutorController.googleLogin)
 tutorRouter.post('/resetPassword',tutorController.resetPassword)
@@ -17,11 +20,9 @@ tutorRouter.get('/payouts', tutorIsBlocked,authenticateToken(['tutor']),tutorCon
 tutorRouter.get('/getTotalCoursesCount/:tutorId',authenticateToken(['tutor']),tutorController.getTotalCoursesCount)
 tutorRouter.get('/getStudentsCount/:tutorId',authenticateToken(['tutor']),tutorController.getTotalStudentsCount)
 tutorRouter.post('/additionalInfo',tutorController.additionalInfo)
-tutorRouter.post('/editProfile',tutorController.editProfile)
+tutorRouter.post('/editProfile',authenticateToken(['tutor']),tutorController.editProfile)
 tutorRouter.get('/tutorPayoutsByMonth' , tutorController.payoutsByMonth);
-
-
-tutorRouter.patch("/changeCourseStatus/:courseId",  authenticateToken(['tutor']),tutorController.changeCourseStatus)
+tutorRouter.patch("/changeCourseStatus/:courseId", authenticateToken(['tutor']), authenticateToken(['tutor']),tutorController.changeCourseStatus)
 
 
 export {tutorRouter}

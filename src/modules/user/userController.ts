@@ -1,9 +1,10 @@
-import express, { Request, Response } from "express";
+import  { Request, Response } from "express";
 import userRabbitMqClient from "./rabbitMQ/client";
 import courseRabbtiMqClient from '../course/rabbitMQ/client'
 import { generateToken } from "../../jwt/jwtCreate";
 import jwt from "jsonwebtoken";
 import { S3Client, GetObjectCommand,PutObjectCommand} from '@aws-sdk/client-s3'
+import config from "../../config";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 const s3Client = new S3Client({
     region: 'ap-south-1',
@@ -109,11 +110,11 @@ export const userController = {
                 const { accessToken, refreshToken } = generateToken({
                     id: result.userData._id,
                     email: result.userData.email,
-                    role:'user',
+                    role:"user",
                 });
 
-                res.cookie('userId', result.userData._id)
-                console.log("cookieeeeees",req.cookies.userId)
+                
+                
                 return res.json({result,token:{accessToken,refreshToken}})
             }
 
@@ -124,26 +125,24 @@ export const userController = {
     },
 
     refreshToken: async (req: Request, res: Response) => {
-        const token = req.cookies.refreshToken;
+        console.log('refreshtoken reached',req.body.token)
+        const token = req.body.token?.replace(/"/g, ''); 
     if (!token) {
         return res.status(401).json({ message: "Refresh token is missing" });
     }
 
-    jwt.verify(token, process.env.JWT_REFRESH_SECRET as string, (err: any, user: any) => {
+    jwt.verify(token, config.JWT_REFRESH_SECRET as string, (err: any, user: any) => {
         if (err) {
+            console.log('verfication failed for user',err)
+
             return res.status(403).json({ message: "Refresh token is invalid or expired" });
         }
+        console.log('verfication sucess for user',)
+
 
         const { id, email } = user;
-        const newAccessToken = jwt.sign({ id, email }, process.env.JWT_SECRET as string, { expiresIn: '15m' });
+        const newAccessToken = jwt.sign({ id, email,role:user.role }, config.JWT_REFRESH_SECRET as string, { expiresIn: '15m' });
 
-        res.cookie("accessToken", newAccessToken, {
-            httpOnly: true,  // Cookie is not accessible via JavaScript
-            secure: false,   // Allow cookie to be sent over HTTP
-            // secure: true,  Cookie is sent only over HTTPS
-            maxAge: 15 * 60 * 1000, // 15 minutes
-            sameSite: "strict" // Prevents cross-site request forgery (CSRF)
-        });
 
         res.json({ accessToken: newAccessToken });
     });
@@ -190,7 +189,7 @@ export const userController = {
                     email: result.user.email,
                     role:'user',
                 });
-                res.cookie('userId', result.user._id)
+                
 
             return res.json({result,token:{accessToken,refreshToken}})
             }

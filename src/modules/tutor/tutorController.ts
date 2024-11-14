@@ -1,9 +1,10 @@
-import exress,{Request,Response} from 'express';
+import {Request,Response} from 'express';
+import jwt  from 'jsonwebtoken';
+import config from '../../config';
 import tutorRabbitMqClient from './rabbitMQ.ts/client';
 import courseRabbitMqClient from '../course/rabbitMQ/client';
  import ordeRabbitMqClient from '../orders/rabbitMQ/client'
 import { generateToken } from '../../jwt/jwtCreate';
-
 import { S3Client, GetObjectCommand,PutObjectCommand} from '@aws-sdk/client-s3'
 
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
@@ -82,8 +83,10 @@ export const tutorController={
             const operation = 'tutor_login';
             const result :any = await  tutorRabbitMqClient.produce(data,operation);
             if(result.success){
-                const token = generateToken({id:result.tutorData._id,email:result.tutorData.email,role:'tutor'})
-                res.cookie('tutorId', result.tutorData._id);
+                const token = generateToken({
+                    id:result.tutorData._id,
+                    email:result.tutorData.email,
+                    role:'tutor'})
                 result.token = token;
                 console.log("cookieeeeee",req.cookies.tutorId)
                 console.log('tokeeeeeeen',result,result.token)
@@ -307,5 +310,31 @@ export const tutorController={
             console.log("Error in  fetching result for tutorPayoutsForMonth",error)
         }
     },
+    refreshToken: async (req: Request, res: Response) => {
+        console.log('tooookssssssssssssssssssssssssssssssssssssen tutor')
+
+        const token = req.body.token?.replace(/"/g, ''); 
+        console.log('tooooken',token)
+        console.log('tooookensss',req.body.token)
+
+    if (!token) {
+        return res.status(401).json({ message: "Refresh token is missing" });
+    }
+
+    jwt.verify(token, config.JWT_REFRESH_SECRET as string, (err: any, user: any) => {
+        if (err) {
+            console.log('verfication failed',err)
+            return res.status(403).json({ message: "Refresh token is invalid or expired" });
+        }
+
+        const { id, email } = user;
+        console.log("user role",user)
+        const newAccessToken = jwt.sign({ id, email ,role:user.role}, config.JWT_SECRET as string, { expiresIn: '15m' });
+
+     
+
+        res.json({ accessToken: newAccessToken });
+    });
+},
 }
 

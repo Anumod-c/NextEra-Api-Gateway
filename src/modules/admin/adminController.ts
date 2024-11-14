@@ -1,10 +1,12 @@
 import express, { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import userRabbitMqClient from "../user/rabbitMQ/client";
 import ordeRabbitMqClient from "../orders/rabbitMQ/client";
 import adminRabbitMqClient from "./rabbitMQ/client";
 import { generateToken } from "../../jwt/jwtCreate";
 import tutorRabbitMqClient from "../tutor/rabbitMQ.ts/client";
 import courseRabbitMqClient from "../course/rabbitMQ/client";
+import config from "../../config";
 export const adminController = {
     login: async (req: Request, res: Response) => {
         try {
@@ -18,6 +20,7 @@ export const adminController = {
                     email: result.adminData.email,
                     role: "admin",
                 });
+                
                 result.token = token;
             }
             console.log("result back from adminservice", result);
@@ -26,6 +29,33 @@ export const adminController = {
             console.log(err, "error happend in login");
         }
     },
+
+    refreshToken: async (req: Request, res: Response) => {
+        console.log('tooookssssssssssssssssssssssssssssssssssssen')
+
+        const token = req.body.token?.replace(/"/g, ''); 
+        console.log('tooooken',token)
+        console.log('tooookensss',req.body.token)
+
+    if (!token) {
+        return res.status(401).json({ message: "Refresh token is missing" });
+    }
+
+    jwt.verify(token, config.JWT_REFRESH_SECRET as string, (err: any, user: any) => {
+        if (err) {
+            console.log('verfication failed',err)
+            return res.status(403).json({ message: "Refresh token is invalid or expired" });
+        }
+
+        const { id, email } = user;
+        console.log("user role",user)
+        const newAccessToken = jwt.sign({ id, email ,role:user.role}, config.JWT_SECRET as string, { expiresIn: '15m' });
+
+     
+
+        res.json({ accessToken: newAccessToken });
+    });
+},
 
     getUsers: async (req: Request, res: Response) => {
         try {

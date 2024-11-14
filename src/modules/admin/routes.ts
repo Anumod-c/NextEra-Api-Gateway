@@ -5,6 +5,9 @@ import authenticateToken from "../../middleware/authMiddleware";
 const adminRouter = express.Router();
 
 adminRouter.post("/login", adminController.login);
+adminRouter.post('/refresh-token',adminController.refreshToken)
+
+
 adminRouter.get("/getUsers", authenticateToken(['admin']), adminController.getUsers);
 adminRouter.get("/getTutors", authenticateToken(['admin']), adminController.getTutors);
 adminRouter.get("/getStudentsCount",  authenticateToken(['admin']),adminController.getStudentsCount);
