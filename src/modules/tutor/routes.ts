@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import { tutorController } from './tutorController';
 import authenticateToken from '../../middleware/authMiddleware';
-import { tutorIsBlocked } from '../../middleware/IsBlockedMiddleware';
+import { isTutorBlocked } from '../../middleware/IsBlockedMiddleware';
 
 const tutorRouter = express.Router();
 tutorRouter.post('/register',tutorController.register);
@@ -15,14 +15,15 @@ tutorRouter.post('/google_login',tutorController.googleLogin)
 tutorRouter.post('/resetPassword',tutorController.resetPassword)
 tutorRouter.get('/get-presigned-url', tutorController.getPresignedUrlForUpload);
 tutorRouter.get('/get-presigned-url-download',tutorController.getPresignedUrlForDownload);
-tutorRouter.get('/courseList',tutorIsBlocked,authenticateToken(['tutor']),tutorController.courseList);
-tutorRouter.get('/payouts', tutorIsBlocked,authenticateToken(['tutor']),tutorController.payouts)
-tutorRouter.get('/getTotalCoursesCount/:tutorId',authenticateToken(['tutor']),tutorController.getTotalCoursesCount)
-tutorRouter.get('/getStudentsCount/:tutorId',authenticateToken(['tutor']),tutorController.getTotalStudentsCount)
+tutorRouter.get('/courseList',isTutorBlocked,authenticateToken(['tutor']),tutorController.courseList);
+tutorRouter.get('/payouts', isTutorBlocked,authenticateToken(['tutor']),tutorController.payouts)
+tutorRouter.get('/getTotalCoursesCount/:tutorId',isTutorBlocked,authenticateToken(['tutor']),tutorController.getTotalCoursesCount)
+tutorRouter.get('/getStudentsCount/:tutorId',isTutorBlocked,authenticateToken(['tutor']),tutorController.getTotalStudentsCount)
 tutorRouter.post('/additionalInfo',tutorController.additionalInfo)
-tutorRouter.post('/editProfile',authenticateToken(['tutor']),tutorController.editProfile)
-tutorRouter.get('/tutorPayoutsByMonth' , tutorController.payoutsByMonth);
-tutorRouter.patch("/changeCourseStatus/:courseId", authenticateToken(['tutor']), authenticateToken(['tutor']),tutorController.changeCourseStatus)
+tutorRouter.post('/editProfile',isTutorBlocked,authenticateToken(['tutor']),tutorController.editProfile)
+tutorRouter.get('/tutorPayoutsByMonth' ,isTutorBlocked, tutorController.payoutsByMonth);
+tutorRouter.get('/getEnrollments' ,isTutorBlocked, tutorController.getEnrollments);
+tutorRouter.patch("/changeCourseStatus/:courseId",isTutorBlocked, authenticateToken(['tutor']),tutorController.changeCourseStatus)
 
 
 export {tutorRouter}

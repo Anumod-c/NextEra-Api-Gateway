@@ -51,7 +51,7 @@ class RabbitMQClient{
         }
     }
 
-    async produce(data:any={},
+    async produce(data:any,
         operations:string){
             if(!this.isInitialized){
                 await this.inittialize();

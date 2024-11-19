@@ -6,7 +6,7 @@ import courseRabbitMqClient from "./rabbitMQ/client";
 export const courseController = {
   AddCourse: async (req: Request, res: Response) => {
     try {
-      console.log("data form addcourse1", req.body);
+      console.log("data form addcourse", req.body);
       const data = req.body;
       const operation = "AddCourse";
       const result: any = await courseRabbitMqClient.produce(data, operation);
@@ -215,6 +215,43 @@ export const courseController = {
       });
     } catch (error) {
       console.log("error in fetching Latest course", error);
+    }
+  },
+  fetchMostPurchasedCourse: async (req: Request, res: Response) => {
+    try {
+      const operation = "fetchMostPurchasedCourse";
+      console.log("reached  fetchMostPurchasedCourse course");
+
+      const result: any = await courseRabbitMqClient.produce({}, operation);
+      console.log(" fetchMostPurchasedCourse result", result);
+      console.log("fetchMostPurchasedCourse");
+      if (result.success && result.courses.length > 0) {
+        const coursesWithTutors = await Promise.all(
+          result.courses.map(async (course: any) => {
+            const tutorId = course.tutorId;
+            const tutorDetails = await tutorRabbitMqClient.produce(
+              tutorId,
+              "fetchTutorById"
+            );
+            return {
+              ...course,
+              tutorDetails: tutorDetails ? tutorDetails : null,
+            };
+          })
+        );
+        return res.json({
+          success: true,
+          message:
+            "fetchMostPurchasedCourse Courses fetched successfully with tutor details",
+          courses: coursesWithTutors,
+        });
+      }
+      return res.json({
+        success: false,
+        message: "No courses found",
+      });
+    } catch (error) {
+      console.log("error in fetching MostPurchasedCourse course", error);
     }
   },
   fetchMyCourses: async (req: Request, res: Response) => {

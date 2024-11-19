@@ -1,8 +1,8 @@
 import  express  from "express"
 import { userController } from "./userController";
-import { userIsBlocked } from "../../middleware/IsBlockedMiddleware";
 import authenticateToken from "../../middleware/authMiddleware";
-const userRouter = express.Router();
+import { userIsBlocked } from "../../middleware/IsBlockedMiddleware";
+const userRouter = express.Router()
 
 userRouter.post('/register',userController.register)
 userRouter.post('/otp',userController.otp)

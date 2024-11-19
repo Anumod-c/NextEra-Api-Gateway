@@ -41,6 +41,7 @@ export const userController = {
 
             const enteredOtp = req.body.otp;
             const forgotPass = req.body.forgotPass;
+            const userId=req.body.userId;
             let operation = "register_otp";
 
             if (forgotPass) {
@@ -51,7 +52,7 @@ export const userController = {
 
             // Send request to the user service to create the user
             const result: any = await userRabbitMqClient.produce(
-                { otp: enteredOtp },
+                { otp: enteredOtp,userId:userId },
                 operation
             );
             console.log("OTP sent from API Gateway to user service", result);

@@ -310,6 +310,20 @@ export const tutorController={
             console.log("Error in  fetching result for tutorPayoutsForMonth",error)
         }
     },
+    getEnrollments:async(req:Request,res:Response)=>{
+        try {
+            console.log('reached getEnrollments')
+            const tutorId = req.query.tutorId;
+            console.log('tutorIdddddddddddddd',tutorId)
+            const operation = 'getStudentEnrollments'
+            console.log('hy from  getStudentEnrollments')
+            const result = await courseRabbitMqClient.produce(tutorId,operation);
+            console.log('result from getStudentEnrollments',result)
+            return res.json(result)
+        } catch (error) {
+            console.log("Error in  fetching result for tutorPayoutsForMonth",error)
+        }
+    },
     refreshToken: async (req: Request, res: Response) => {
         console.log('tooookssssssssssssssssssssssssssssssssssssen tutor')
 

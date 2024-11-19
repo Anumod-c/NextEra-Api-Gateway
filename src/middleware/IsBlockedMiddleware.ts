@@ -16,7 +16,7 @@ interface TutorCheckResult{
     tutor?:ITutor;
 }
 
-export const userIsBlocked = async (req: Request, res: Response, next: NextFunction) => {
+ const userIsBlocked = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = req.cookies.userId; // Assuming userId is set in the cookies
         const operation = 'checkUserBlocked';
@@ -36,7 +36,7 @@ export const userIsBlocked = async (req: Request, res: Response, next: NextFunct
     }
 
 };
-export const tutorIsBlocked = async (req:Request,res:Response,next:NextFunction)=>{
+ const isTutorBlocked = async (req:Request,res:Response,next:NextFunction)=>{
     try {
         const tutorId = req.cookies.tutorId
         console.log('helloooooooooos',tutorId)
@@ -55,3 +55,5 @@ export const tutorIsBlocked = async (req:Request,res:Response,next:NextFunction)
         return res.status(500).json({ message: 'Internal server error.' });
     }
 }
+
+export {isTutorBlocked,userIsBlocked}
